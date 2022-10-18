@@ -1,0 +1,2 @@
+- Controllare nomi matrici 
+- Verificare fallimento controllo 
