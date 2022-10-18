@@ -3,9 +3,6 @@ from math import sqrt
 import numpy as np
 
 
-FLOAT_PRECISION = 2
-
-
 def __check_requirements(A: np.ndarray) -> bool:
 
     def is_square(matrix: np.ndarray) -> bool:
@@ -91,7 +88,7 @@ def compute(A: np.ndarray) -> np.ndarray:
                 
                 L[i][j] = (1/L[j][j])*(A[i][j] - tmp)   # calcolo i valori delle colonne
 
-    return np.round(L, FLOAT_PRECISION)
+    return L
 
 
 def is_correct_solution(A: np.ndarray, L: np.ndarray) -> bool:
@@ -99,6 +96,6 @@ def is_correct_solution(A: np.ndarray, L: np.ndarray) -> bool:
         Applico l'algoritmo implementato in numpy e confronto il risultato con il mio
     '''
 
-    L_correct = np.round(np.linalg.cholesky(A), FLOAT_PRECISION)
+    L_correct = np.linalg.cholesky(A)
 
-    return (L == L_correct).all() 
+    return np.allclose(L, L_correct, 0.01)
