@@ -1,5 +1,6 @@
-import cholesky as Cholesky_factorization
 import numpy as np
+import cholesky as Cholesky_factorization
+from tester import get_execution_time
 
 
 def main():
@@ -13,7 +14,7 @@ def main():
 
     print(f"A:\n{A}\n")
 
-    L = Cholesky_factorization.compute(A)
+    execution_time, L = get_execution_time(Cholesky_factorization.compute, [A])
     
     if L is None:
         print("Impossibile scomporre la matrice data !!")
@@ -21,6 +22,7 @@ def main():
     
     print(f"L:\n{L}")
     print(f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution(A, L)) else '❌'}")
+    print(f"Tempo di esecuzione: {execution_time}")
 
 
 if __name__ == "__main__":
