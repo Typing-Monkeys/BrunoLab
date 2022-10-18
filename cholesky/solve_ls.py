@@ -138,8 +138,6 @@ class Cholesky_factorization:
         print("\n Complet Matrix")
         print(ux_matrix)
 
-        n = len(x)
-
         # Calcolate element to diagonal U matrix 
         diagon_u = U.diagonal()
 
