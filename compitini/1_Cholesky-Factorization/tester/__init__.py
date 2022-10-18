@@ -1,1 +1,1 @@
-from .time_tester import get_execution_time
+from .time_tester import get_execution_time, generate_matrix
