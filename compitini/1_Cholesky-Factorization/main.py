@@ -21,22 +21,26 @@ def main():
     print(f"b:\n{b}\n")
 
     # --- Decomposizione della matrice A in LU --- #
+    print("CHOLESKY FACTORIZATION ...")
+
     execution_time, L = Tester.get_execution_time(Cholesky_factorization.compute, [A])
     
     if L is None:
         print("Impossibile scomporre la matrice data !!")
         return -1
     
-    print(f"L:\n{L}")
+    print(f"L:\n{L}\n")
     print(f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution(A, L)) else '❌'}")
     print(f"Tempo di esecuzione: {execution_time}")
     print('\n')
 
     # --- Risoluzione del Sistema Lineare --- #
+    print("SOLVING LINEAR SYSTEM ...")
+
     execution_time, x = Tester.get_execution_time(Linear_sistem.solve, [L, b])
 
-    print(f"x: \n{x}")
-    print(f"Il risultato è corretto ?: {'✅' if (Linear_sistem.check_solution(A, x, b)) else '❌'}")
+    print(f"x: \n{x}\n")
+    print(f"Il risultato è corretto ?: {'✅' if (Linear_sistem.is_correct_solution(A, x, b)) else '❌'}")
     print(f"Tempo di esecuzione: {execution_time}")
 
 
