@@ -124,6 +124,17 @@ class Cholesky_factorization:
 
     def solveLU(L, U, b):
 
+        '''
+            THE SYSTEM IS SOLVABLE? 
+
+            In the case where A is full rank, the matrix A^TA is symmetrical defined positive, 
+            and it is therefore possible to solve the normal system by Cholesky factorization.
+
+            In the case where A is not symmetrical defined positive is not decomposable by Cholesky
+            and the linear system can be solved in other ways but not with Cholesky. 
+        
+        '''
+
         # Transformation the matrix by 0 and shape
         L = np.array(L, float)
         U = np.array(U, float)
@@ -136,74 +147,23 @@ class Cholesky_factorization:
         # Incognites for U
         x = np.zeros(n)
 
-        # Add 1 column to matrix for compose complet matrix 
-        uxy_matrix = np.append(U, b, axis=1)
+        # Forword sostitution
+        for i in range(n):
+            sumj = 0
+            for j in range(i):
+                sumj += L[i, j] * y[j]
 
-        print("\n Complet Matrix")
-        print(uxy_matrix)
+            y[i] = (b[i]-sumj)/L[i, i]
 
-        # Calcolate element to diagonal U matrix 
-        diagon_u = U.diagonal()
+        # Backword subsostitution
+        for i in range(n-1, -1, -1):
+            sumj = 0
+            for j in range(i+1, n):
+                sumj += U[i, j] * x[j]
 
-        # Calcolate element to diagonal UX matrix 
-        diagon_ux = uxy_matrix.diagonal()
-        
-        # Calcolate det matrix u
-        det_ux = diagon_u.prod()
+            x[i] = (y[i]-sumj)/U[i, i]
 
-        # Calolcate det matrix ux
-        det_uxy = diagon_ux.prod()
-
-        '''
-            Rouche Capelli Theorem 
-
-            1. Solution:
-
-                The Rouché-Capelli theorem states that solutions exist for the system 
-                
-                IF AND ONLY IF 
-                
-                the rank of the complete matrix IS EQUAL to the rank of the incomplete matrix
-            
-            2. NO SOLUTION: 
-
-                IF the rank of the incomplete matrix IS LOWER to the rank of complete matrix 
-        '''
-
-        if det_ux == det_uxy:
-            
-            print("\n")
-
-            print(f"Det of first matrix: {det_ux}")
-
-            print("\n")
-
-            print(f"Det of second matrix: {det_uxy}")
-
-            print("\n")
-
-            print("The system is solvable")
-
-            # Forword sostitution
-            for i in range(n):
-                sumj = 0
-                for j in range(i):
-                    sumj += L[i, j] * y[j]
-
-                y[i] = (b[i]-sumj)/L[i, i]
-
-            # Backword subsostitution
-            for i in range(n-1, -1, -1):
-                sumj = 0
-                for j in range(i+1, n):
-                    sumj += U[i, j] * x[j]
-
-                x[i] = (y[i]-sumj)/U[i, i]
-
-            return x, y
-
-        else:
-            print("Linear system is not solvable")
+        return x, y
     
 def main():
     A = np.array([
