@@ -5,9 +5,9 @@ import tester as Tester
 
 
 def main():
-    # A = Tester.generate_matrix(size=5, seed=20)
+    A, b = Tester.generate_data(size=5, seed=20)
 
-    A = np.array([
+    """ A = np.array([
         [5.2, 3, 0.5, 1, 2],
         [3, 6.3, -2, 4,0],
         [0.5, -2, 8,-3.1, 3],
@@ -15,7 +15,7 @@ def main():
         [2,0,3,2.6,15]
     ], dtype=float)
 
-    b = np.array([9.45, -12.20, 7.78, -8.1, 10.0], dtype=float) # termine noto
+    b = np.array([9.45, -12.20, 7.78, -8.1, 10.0], dtype=float) # termine noto """
 
     print(f"A:\n{A}\n")
     print(f"b:\n{b}\n")
