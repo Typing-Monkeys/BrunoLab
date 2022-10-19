@@ -1,2 +1,1 @@
-- Controllare nomi matrici 
-- Verificare fallimento controllo 
+- fix det matrix 

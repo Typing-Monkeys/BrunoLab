@@ -129,26 +129,30 @@ class Cholesky_factorization:
         U = np.array(U, float)
         b = np.array(b, float)
         n, _ = np.shape(L)
+
+        # Incognites for L
         y = np.zeros(n)
+
+        # Incognites for U
         x = np.zeros(n)
 
         # Add 1 column to matrix for compose complet matrix 
-        ux_matrix = np.append(U, b, axis=1)
+        uxy_matrix = np.append(U, b, axis=1)
 
         print("\n Complet Matrix")
-        print(ux_matrix)
+        print(uxy_matrix)
 
         # Calcolate element to diagonal U matrix 
         diagon_u = U.diagonal()
 
         # Calcolate element to diagonal UX matrix 
-        diagon_ux = ux_matrix.diagonal()
+        diagon_ux = uxy_matrix.diagonal()
         
-        # Calcolate len diagonal U 
-        det_u = len(diagon_u)
+        # Calcolate det matrix u
+        det_ux = diagon_u.prod()
 
-        # Calolcate len diagonal UX
-        det_ux = len(diagon_ux)
+        # Calolcate det matrix ux
+        det_uxy = diagon_ux.prod()
 
         '''
             Rouche Capelli Theorem 
@@ -166,15 +170,15 @@ class Cholesky_factorization:
                 IF the rank of the incomplete matrix IS LOWER to the rank of complete matrix 
         '''
 
-        if det_u == det_ux:
+        if det_ux == det_uxy:
             
             print("\n")
 
-            print(f"Det of first matrix: {det_u}")
+            print(f"Det of first matrix: {det_ux}")
 
             print("\n")
 
-            print(f"Det of second matrix: {det_ux}")
+            print(f"Det of second matrix: {det_uxy}")
 
             print("\n")
 
@@ -196,7 +200,7 @@ class Cholesky_factorization:
 
                 x[i] = (y[i]-sumj)/U[i, i]
 
-            return x
+            return x, y
 
         else:
             print("Linear system is not solvable")
@@ -250,12 +254,15 @@ def main():
         u -> Upper matrix 
         b -> Know term 
     '''
-    x = Cholesky_factorization.solveLU(L, U, B)
+    x,y = Cholesky_factorization.solveLU(L, U, B)
 
     print("\n")
-
     print("\tSolve linear system with cholesky and backword sostitution")
     print(x)
+
+    print("\n")
+    print("\tSolve linear system with cholesky and forword sostitution")
+    print(y)
 
     print("\n")
 
