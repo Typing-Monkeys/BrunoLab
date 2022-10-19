@@ -1,6 +1,3 @@
-import numpy as np
-import cholesky as Cholesky_factorization
-import linsys as Linear_sistem
 import tester as Tester
 
 
