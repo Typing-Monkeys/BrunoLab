@@ -92,10 +92,12 @@ def compute(A: np.ndarray) -> np.ndarray:
 
 
 def is_correct_solution(A: np.ndarray, L: np.ndarray) -> bool:
-    '''
-        Applico l'algoritmo implementato in numpy e confronto il risultato con il mio
-    '''
+		'''
+            Controllo che la soluzione sia corretta ricalcolando A da LS
+		'''
 
-    L_correct = np.linalg.cholesky(A)
+		A_bis = np.dot(L, np.transpose(L))
+		
+        # print(A_bis)
 
-    return np.allclose(L, L_correct, 0.01)
+		return np.allclose(A, A_bis, 0.001)

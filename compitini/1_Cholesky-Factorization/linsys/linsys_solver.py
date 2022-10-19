@@ -54,7 +54,7 @@ def solve(L, b):
     return x
 
 
-def check_solution(A: np.ndarray, x: np.array, b: np.array) -> bool:
+def is_correct_solution(A: np.ndarray, x: np.array, b: np.array) -> bool:
     '''
         Controlla che la soluzione x al sistema dato Ab sia corretta.
         Questo viene fatto moltiplicando A per x e controllando che il risultato sia
