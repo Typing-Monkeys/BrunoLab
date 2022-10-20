@@ -5,7 +5,7 @@ import linsys as Linear_sistem
 import numpy as np
 
 
-def solve(A: np.ndarray, b: np.array, verbose=True) -> Tuple[np.array, Tuple[int, int]]:
+def solve(A: np.ndarray, b: np.array, method="column", jit=False, verbose=True) -> Tuple[np.array, Tuple[int, int]]:
     '''
         Risolve un dato Sistema Lineare con la fattorizzazione di Cholesky.
 
@@ -33,7 +33,7 @@ def solve(A: np.ndarray, b: np.array, verbose=True) -> Tuple[np.array, Tuple[int
     # --- Decomposizione della matrice A in LU --- #
     logger.print("CHOLESKY FACTORIZATION ...")
 
-    cholesky_execution_time, L = Tester.get_execution_time(Cholesky_factorization.compute, [A])
+    cholesky_execution_time, L = Tester.get_execution_time(Cholesky_factorization.compute, [A, method, jit])
     
     if L is None:
         logger.print("Impossibile scomporre la matrice data !!", force=True)
@@ -56,13 +56,13 @@ def solve(A: np.ndarray, b: np.array, verbose=True) -> Tuple[np.array, Tuple[int
     return (x, (cholesky_execution_time, linsys_execution_time))
 
 
-def find_limit(starting_size=100, seed=20):
+def find_limit(starting_size=100, seed=20, method="column", jit=False):
     size = starting_size
     while True:
         print(f"SIZE: {size}x{size}")
 
         A, b = Tester.generate_data(size, seed)
-        _, execution_times = solve(A, b, verbose=False)
+        _, execution_times = solve(A, b, method, jit, verbose=False)
         
         print(f"Cholesky Execution Time: {execution_times[0]} ms")
         print(f"Linear System Execution Time: {execution_times[1]} ms")
