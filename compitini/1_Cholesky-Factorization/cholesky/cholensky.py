@@ -1,5 +1,6 @@
 from ctypes.wintypes import FLOAT
 from math import sqrt
+from numba import jit
 import numpy as np
 
 
@@ -55,7 +56,7 @@ def __check_requirements(A: np.ndarray) -> bool:
     return is_square(A) and is_symmetric(A) and is_positive_definite(A)
 
 
-def compute(A: np.ndarray) -> np.ndarray:
+def compute_columns_no_numba(A: np.ndarray) -> np.ndarray:
     '''
         Applica la fattorizzazinoe di Cholesky per ottenere la matrice L
         Per poter funzionare devono essere rispettate le condizioni imposte dalle
@@ -75,20 +76,46 @@ def compute(A: np.ndarray) -> np.ndarray:
     for j in range(n):
         for i in range(j, n):
             if (i == j):
-                tmp = 0
-                for k in range((j)):
-                    tmp += (L[i][k])**2
-                
-                L[i][j] = sqrt(A[i][j] - tmp)   # calcolo i valori della diagonale
-
+                L[i,j] = np.sqrt(A[i,j]-np.sum(L[i,:j]**2))   # calcolo i valori della diagonale
             else:
-                tmp = 0
-                for k in range((j)):
-                    tmp += L[i][k] * L[j][k]
-                
-                L[i][j] = (1/L[j][j])*(A[i][j] - tmp)   # calcolo i valori delle colonne
+                L[i,j] = (A[i,j]-np.sum(L[i,:j]*L[j,:j])) / L[j,j]   # calcolo i valori delle colonne
 
     return L
+
+def compute(A: np.ndarray) -> np.ndarray:
+    '''
+        Applica la fattorizzazinoe di Cholesky per ottenere la matrice L
+        Per poter funzionare devono essere rispettate le condizioni imposte dalle
+        precedenti funzioni.
+    '''
+    #TODO: Vedere se definirle qui dentro peggiora il tempo di esecuzione (forse le deve ricompilare ogni volta?)
+    @jit(nopython=True)
+    def column_columns_numba(L: np.array,A: np.array,i: int,j: int) -> bool:
+        L[i,j] = np.sqrt(A[i,j]-np.sum(L[i,:j]**2))
+
+    @jit(nopython=True)
+    def row_columns_numba(L: np.array,A: np.array,i: int,j: int) -> bool:
+        L[i,j] = (A[i,j]-np.sum(L[i,:j]*L[j,:j])) / L[j,j]
+    
+    is_factorizable = __check_requirements(A)
+
+    # i vincoli non sono soddisfatti, la matrice data non si può fattorizzare
+    if not is_factorizable:
+        return None
+
+    n, _ = A.shape
+
+    L = np.zeros(n*n, dtype=float).reshape(n, n)    # inizializzo la matricce risultato
+
+    for j in range(n):
+        for i in range(j, n):
+            if (i == j):
+                column_columns_numba(L,A,i,j)   # calcolo i valori della diagonale
+            else:
+                row_columns_numba(L,A,i,j)   # calcolo i valori delle colonne
+
+    return L
+
 
 
 def is_correct_solution(A: np.ndarray, L: np.ndarray) -> bool:
