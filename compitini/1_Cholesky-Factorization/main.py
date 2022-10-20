@@ -9,7 +9,7 @@ def main(args):
     else:
         A, b = Tester.generate_data(size=5, seed=20)
 
-        _ = Tester.solve(A, b)
+        _ = Tester.simple_test(A, b)
 
     """ A = np.array([
         [5.2, 3, 0.5, 1, 2],
