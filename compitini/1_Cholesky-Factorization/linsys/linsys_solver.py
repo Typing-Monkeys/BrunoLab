@@ -37,16 +37,16 @@ def solve(L, b):
 
     # Forword sostitution
     for i in range(n):
-        sumj = 0
-        for j in range(i):
+        sumj = 0                    # TODO: si portrebbe riscrivere con la 
+        for j in range(i):          # sommatoria di numpy
             sumj += L[i, j] * y[j]
 
         y[i] = (b[i]-sumj)/L[i, i]
 
     # Backword subsostitution
     for i in range(n-1, -1, -1):
-        sumj = 0
-        for j in range(i+1, n):
+        sumj = 0                    # TODO: si portrebbe riscrivere con la 
+        for j in range(i+1, n):     # sommatoria di numpy
             sumj += U[i, j] * x[j]
 
         x[i] = (y[i]-sumj)/U[i, i]
