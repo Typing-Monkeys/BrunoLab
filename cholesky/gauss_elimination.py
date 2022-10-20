@@ -165,6 +165,34 @@ class Cholesky_factorization:
 
         return x, y
     
+    #The matrix form must be already in [A|b] form
+    #where A is sistem, and b is the output
+    def gaussElimination(matrix):
+        
+        #ensure the array
+        np.asarray(matrix) 
+        #ensure the datatype is float
+        matrix = matrix.astype(float)
+     
+        if matrix[0,0] == 0.0:
+            raise Exception("matrix row 1 column 1 cannot be zero!")
+        n,m = matrix.shape
+        #start the elimination phase
+        for i in range(0,n):#row
+            for j in range(i+1,n):
+                if matrix[j,i] != 0.0:
+                    multiplier = matrix[j,i]/matrix[i,i]
+                    #print matrix[i,k],matrix[k,k],multiplier 
+                    #just to verbose multiplier process
+                    matrix[j,i:m]=matrix[j,i:m] - multiplier*matrix[i,i:m] 
+        
+        # Convert matrix by float from scientif notation     
+        m_convert = matrix.astype(float)
+        
+        # Rounding 2 decimal place
+        m_final = np.around(m_convert,2)
+              
+        return m_final
     
 def main():
     A = np.array([
@@ -186,6 +214,14 @@ def main():
     print(f"L:\n{L}")
     print(
         f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution(A, L)) else '❌'}")
+    
+    print("\n")
+    
+    print("\t\tMatrix elimination with Gauss")
+    
+    gauss_sol = Cholesky_factorization.gaussElimination(A)
+    
+    print(gauss_sol)
 
     # Known term
     B = np.array([[9.45], 
@@ -229,12 +265,9 @@ def main():
 
     print("\t\tSolve linear system using a np.linalg method")
     # Solve system using a np.linalg method
-    x2 = np.linalg.solve(A, B)
+    x2 = np.linalg.solve(A,B)
 
     print(x2)
-
- 
-
-
+    
 if __name__ == "__main__":
     main()
