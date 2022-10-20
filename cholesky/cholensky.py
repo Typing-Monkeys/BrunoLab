@@ -1,7 +1,7 @@
 from ctypes.wintypes import FLOAT
 from math import sqrt
 import numpy as np
-
+from numba import jit
 
 class Cholesky_factorization:
     FLOAT_PRECISION = 2
@@ -56,6 +56,77 @@ class Cholesky_factorization:
 
         # controlla se tutti i requisiti sono soddisfatti
         return is_square(A) and is_symmetric(A) and is_positive_definite(A)
+
+
+
+    '''
+    Calcola la fattorizzazione iterando lungo le righe della matrice A
+
+    La variabile trasposed serve perchè se calcolata per righe torna la trasposta di quella calcolata per 
+    colonne, quindi così è più facile confrontarle
+
+    '''
+    def compute_by_row(A:np.ndarray, transposed:bool) -> np.ndarray:
+        
+        # Prima di fattorizzare controlla che A rispetta i prerequisiti necessari
+        is_factorizable = Cholesky_factorization.__check_requirements(A)
+
+        if not is_factorizable:
+            return None
+        
+        n, _ = A.shape
+
+        L = np.zeros(n*n, dtype=float).reshape(n, n)    # inizializzo la matricce risultato
+
+        for i in range(n):
+            for j in range(i, n):
+                if (i == j):
+                    L[i,j] = np.sqrt(A[i,j]-np.sum(L[:i,j]**2))   # calcolo i valori della diagonale
+                else:
+                    L[i,j] = (A[i,j]-np.sum(L[:i,j]*L[:i,i])) / L[i,i]   # calcolo i valori delle colonne
+        if not transposed:
+            return np.round(L, Cholesky_factorization.FLOAT_PRECISION)
+
+        return np.round(L.transpose(), Cholesky_factorization.FLOAT_PRECISION)
+        
+    def compute_by_row_numba(A:np.ndarray, transposed:bool) -> np.ndarray:
+        # Definizione delle robe da fare jit con numba
+
+
+        # Calcola la fattorizzazione degli elementi lungo la diagonale di A
+        @jit(nopython=True)
+        def row_diagonal(L:np.ndarray, A:np.ndarray, i:int, j:int) -> bool:
+            L[i,j] = np.sqrt(A[i,j]-np.sum(L[:i,j]**2))
+
+        # Calcola la fattorizzazione degli elementi che non sono sulla diagonale di A
+        @jit(nopython=True)
+        def row_non_diagonal(L:np.ndarray, A:np.ndarray, i:int, j:int) -> bool:
+            L[i,j] = (A[i,j]-np.sum(L[:i,j]*L[:i,i])) / L[i,i]
+
+
+        # Prima di fattorizzare controlla che A rispetta i prerequisiti necessari
+        is_factorizable = Cholesky_factorization.__check_requirements(A)
+
+        if not is_factorizable:
+            return None
+        
+        n, _ = A.shape
+
+        L = np.zeros(n*n, dtype=float).reshape(n, n)    # inizializzo la matricce risultato
+
+        for i in range(n):
+            for j in range(i, n):
+                if (i == j):
+                    row_diagonal(L,A,i,j)   # calcolo i valori della diagonale
+                else:
+                    row_non_diagonal(L,A,i,j)  # calcolo i valori delle colonne
+
+
+        if not transposed:
+            return np.round(L, Cholesky_factorization.FLOAT_PRECISION)
+
+        return np.round(L.transpose(), Cholesky_factorization.FLOAT_PRECISION)
+        
 
     def compute(A: np.ndarray) -> np.ndarray:
         '''
@@ -113,7 +184,7 @@ def main():
 
     print(f"A:\n{A}\n")
 
-    L = Cholesky_factorization.compute(A)
+    L = Cholesky_factorization.compute_by_row_numba(A,1)
     
     if L is None:
         print("Impossibile scomporre la matrice data !!")
