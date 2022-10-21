@@ -21,7 +21,7 @@ end
 x = 10
 F(x)
 #}
-
+#{
 plot3(x,y,z,'p'); hold on
 
 # calcolare il piano per i primi 3 punti
@@ -59,3 +59,69 @@ y = -3:0.1:3;
 [xx yy] = meshgrid(x, y);
 
 mesh(xx,yy,-v1(1)/v1(3)*xx-v1(2)/v1(3)*yy+1/v1(3));
+hold off
+#}
+%Continuo laboratorio del 14 ottobre 2022
+
+%Idealmente vogliamo un piano che passa per tutti i punti
+%ovvero fare il minimo quadrato su tutti i punti
+%due equazioni diverse ma dovrebbero dare lo stesso risultato
+clear
+clf
+load data03.m
+plot3(x,y,z,'p'); hold on
+A3 = [x y z];
+b3 = ones(N,1);
+v3 = A3\b3;
+
+x0 = -3:0.1:3;
+y0 = -3:0.1:3;
+
+[xx yy] = meshgrid(x0, y0);
+
+mesh(xx,yy,(1-v3(1)*xx-v3(2)*yy)/v3(3));
+
+%trovare la rotazione da fare nel piano
+%poi applicarla a tutti i punti del dataset
+%e trovare il nuovo piano con i minimi quadrati
+
+vn = v3;
+
+G = givens(vn(2),vn(1));
+G1 = [G' zeros(2,1);0 0 1];
+vn = G1*vn;
+G2 = givens(vn(3),vn(2));
+G3 = [1 0 0; zeros(2,1) G2'];
+vn = G3*vn;
+
+Q=G3*G1;
+vn
+%Dato che traspongo i vettori 
+%x y z è come se moltiplico ogni piunto per Q
+w = Q*[x';y';z'];
+%Q*[x(1);y(1);z(1)]
+clf
+plot3(w(1,:),w(2,:),w(3,:),"p")
+
+%Rotazione tramite QR factorization (Questa funziona)
+clear
+clf
+load data03.m
+plot3(x,y,z,'p'); hold on
+A3 = [x y z];
+b3 = ones(N,1);
+v3 = A3\b3;
+
+P = [0 0 1; 0 1 0; 1 0 0]; %Matrice che scambia x e z
+[Q0 R] = qr(P*v3);
+Q = P * Q0' * P;
+w = Q*[x';y';z'];
+%Q*[x(1);y(1);z(1)]
+plot3(w(1,:),w(2,:),w(3,:),"p")
+
+x0 = -3:0.1:3;
+y0 = -3:0.1:3;
+
+[xx yy] = meshgrid(x0, y0);
+
+mesh(xx,yy,(1-v3(1)*xx-v3(2)*yy)/v3(3));
