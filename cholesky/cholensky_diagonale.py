@@ -144,8 +144,9 @@ def generate_A(size=10, seed=69) -> np.ndarray:
 
 
 def main():
-	#A = generate_A(6)
+	A = generate_A(100)
 
+	'''
 	A = np.array([
 		[5.2, 3, 0.5, 1, 2],
 		[3, 6.3, -2, 4,0],
@@ -153,6 +154,7 @@ def main():
 		[1, 4, -3.1,7.6,2.6],
 		[2,0,3,2.6,15]
 	], dtype=float)
+	'''
 
 	print(f"A:\n{A}\n")
 
@@ -163,7 +165,7 @@ def main():
 		return -1
 	
 	print(f"L:\n{L}")
-	print(f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution(A, L)) else '❌'}")
+	print(f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution_vescers(A, L)) else '❌'}")
 
 
 if __name__ == "__main__":

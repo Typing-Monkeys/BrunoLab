@@ -102,7 +102,22 @@ class Cholesky_factorization:
         return (L == L_correct).all() 
 
 
+def generate_A(size=10, seed=69) -> np.ndarray:
+    '''
+        Genera una matrice Quadrata, Simmetrica e Definita Positiva di dimensione
+        size.
+    '''
+
+    # magic ✨
+    A = np.random.rand(size, size)
+    B = np.dot(A, A.transpose())
+
+    return B
+    
+
 def main():
+    A = generate_A(6)
+    '''
     A = np.array([
         [5.2, 3, 0.5, 1, 2],
         [3, 6.3, -2, 4,0],
@@ -110,7 +125,7 @@ def main():
         [1, 4, -3.1,7.6,2.6],
         [2,0,3,2.6,15]
     ], dtype=float)
-
+    '''
     print(f"A:\n{A}\n")
 
     L = Cholesky_factorization.compute(A)
