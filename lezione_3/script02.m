@@ -95,13 +95,22 @@ G3 = [1 0 0; zeros(2,1) G2'];
 vn = G3*vn;
 
 Q=G3*G1;
-vn
+
 %Dato che traspongo i vettori 
 %x y z è come se moltiplico ogni piunto per Q
 w = Q*[x';y';z'];
 %Q*[x(1);y(1);z(1)]
-clf
-plot3(w(1,:),w(2,:),w(3,:),"p")
+
+plot3(w(1,:),w(2,:),w(3,:),".")
+
+v4 = w'\b3;
+
+x0 = -5:0.1:5;
+y0 = -5:0.1:12;
+
+[xx yy] = meshgrid(x0, y0);
+
+mesh(xx,yy,(1-v4(1)*xx-v4(2)*yy)/v4(3));
 
 %Rotazione tramite QR factorization (Questa funziona)
 clear
