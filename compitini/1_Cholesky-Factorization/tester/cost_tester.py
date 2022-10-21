@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Any, Callable, Tuple
 from .execution_time import get_execution_time
 from .data_generator import generate_data
 import cholesky as Cholesky_factorization
@@ -69,3 +69,10 @@ def find_limit(starting_size=100, seed=20, method="column", jit=False):
         print("\n")
         
         size *= 2
+
+
+# TODO: implementare !
+#       questa funzione deve prendere in input un algoritmo (Gauss o Cholesky)
+#       e testarlo su una data matrice per vedere quanto è veloce.
+def benchmark(algorithm: Callable) -> Tuple[int, Any]:
+    raise NotImplementedError
