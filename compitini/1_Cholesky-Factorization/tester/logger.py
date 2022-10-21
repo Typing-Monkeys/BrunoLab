@@ -1,3 +1,4 @@
+# TODO: con le nuove modifiche sembra inutile
 class Logger:
     def __init__(self, verbose=True):
         self.verbose = verbose
