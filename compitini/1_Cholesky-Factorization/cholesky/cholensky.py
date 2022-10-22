@@ -94,6 +94,9 @@ def __check_requirements(A: np.ndarray) -> bool:
 #       ciò fa peggiorare le performance di esecuzione (sul mio pc di 1000 ms).
 #
 # TODO: controllare che effettivamente è vero e il perchè.
+# TODO: nelle seguenti funzioni compilate abbiamo una roba del tipo
+#       L[i, j] = ...
+#       Sta cosa funziona perchè L è passato per riferimento, ma ci piace come cosa ?
 
 ## ~~ by COLUMN
 @jit(nopython=True)
@@ -116,6 +119,14 @@ def __row_diagonal(L:np.ndarray, A:np.ndarray, i:int, j:int) -> bool:
 def __row_non_diagonal(L:np.ndarray, A:np.ndarray, i:int, j:int) -> bool:
     L[i,j] = (A[i,j]-np.sum(L[:i,j]*L[:i,i])) / L[i,i]
 
+
+## ~~ by DIAGONAL
+@jit(nopython=True)
+def __cholesky_formula_diagonal(i, j, A, L):
+        if (i == j):
+            return np.sqrt(A[i,j]-np.sum(L[i,:j]**2))   # calcolo i valori della diagonale
+        
+        return (A[i,j]-np.sum(L[i,:j]*L[j,:j])) / L[j,j]    # calcolo i valori delle colonne
 
 
 # --- CHOLESKY METHODS --- #
@@ -173,7 +184,59 @@ def __compute_by_row(A: np.ndarray, jit=False) -> np.ndarray:
 
 
 def __compute_by_diagonal(A: np.ndarray, jit=False) -> np.ndarray:
-    raise NotImplementedError
+    # TODO: sta cosa funziona ma potrebbe essere migliorata !
+
+    def cholesky_formula(i, j, A, L):
+        if (i == j):
+            return np.sqrt(A[i,j]-np.sum(L[i,:j]**2))   # calcolo i valori della diagonale
+        
+        return (A[i,j]-np.sum(L[i,:j]*L[j,:j])) / L[j,j]    # calcolo i valori delle colonne
+
+
+    n, _ = A.shape
+
+    L = np.zeros(n*n, dtype=float).reshape(n, n)    # inizializzo la matricce risultato
+
+    external = 0 #variabile per contare quanti cicli esterni devo fare
+    internal = 2 * n - 1 - 1
+    aux = 0
+    if jit:
+        for row in range(2 * n - 1):
+            if row < n-1:
+                col = 0
+                L[row, col] = __cholesky_formula_diagonal(row, col, A, L)
+                aux += 1
+                for z in range(1, int(np.floor(row/2))+1):
+                    L[row-z, col+z] = __cholesky_formula_diagonal(row-z, col+z, A, L)
+
+            else:
+                col = n-1
+                L[col, row-aux] = __cholesky_formula_diagonal(col, row-aux, A, L)
+                for z in range(1, int(np.floor(internal/2))+1):
+                    L[col-z, row-aux+z] = __cholesky_formula_diagonal(col-z, row-aux+z, A, L)
+
+            internal -= 1   
+            external += 1
+    
+    else:
+        for row in range(2 * n - 1):
+            if row < n-1:
+                col = 0
+                L[row, col] = cholesky_formula(row, col, A, L)
+                aux += 1
+                for z in range(1, int(np.floor(row/2))+1):
+                    L[row-z, col+z] = cholesky_formula(row-z, col+z, A, L)
+
+            else:
+                col = n-1
+                L[col, row-aux] = cholesky_formula(col, row-aux, A, L)
+                for z in range(1, int(np.floor(internal/2))+1):
+                    L[col-z, row-aux+z] = cholesky_formula(col-z, row-aux+z, A, L)
+
+            internal -= 1   
+            external += 1
+        
+    return L
 
 
 methods = {"row": __compute_by_row, "column": __compute_by_column, "diagonal": __compute_by_diagonal}
