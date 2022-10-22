@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def solve(L, b):
+def solve(L: np.ndarray, b: np.array) -> np.array:
 
     '''
         Solve linear sistem using cholesky decomposition 
@@ -24,7 +24,16 @@ def solve(L, b):
         1. Decomposition: [a] = [L][U]
         2. Substitution: [L][U] = {b}
             2.1 Backword substitution [U]{x} = {y}
-            2.2 Forward substitution [L]{y} = {b}         
+            2.2 Forward substitution [L]{y} = {b}  
+
+        THE SYSTEM IS SOLVABLE? 
+
+            In the case where A is full rank, the matrix A^TA is symmetrical defined positive, 
+            and it is therefore possible to solve the normal system by Cholesky factorization.
+
+            In the case where A is not symmetrical defined positive is not decomposable by Cholesky
+            and the linear system can be solved in other ways but not with Cholesky. 
+               
     '''
 
     # Transformation the matrix by 0 and shape
@@ -35,6 +44,9 @@ def solve(L, b):
     y = np.zeros(n)
     x = np.zeros(n)
 
+    # TODO: si potrebbe aggiungere un argomento per scegliere quale 
+    #       metodo utilizzare.
+
     # Forword sostitution
     for i in range(n):
         sumj = 0                    # TODO: si portrebbe riscrivere con la 
@@ -43,7 +55,7 @@ def solve(L, b):
 
         y[i] = (b[i]-sumj)/L[i, i]
 
-    # Backword subsostitution
+    # Backword sostitution
     for i in range(n-1, -1, -1):
         sumj = 0                    # TODO: si portrebbe riscrivere con la 
         for j in range(i+1, n):     # sommatoria di numpy
@@ -52,6 +64,7 @@ def solve(L, b):
         x[i] = (y[i]-sumj)/U[i, i]
 
     return x
+    # return (x, y)
 
 
 def is_correct_solution(A: np.ndarray, x: np.array, b: np.array) -> bool:
