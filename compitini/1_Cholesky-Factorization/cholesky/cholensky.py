@@ -89,6 +89,13 @@ def __check_requirements(A: np.ndarray) -> bool:
 
 # --- JIT COMPILED FUNCTIONS --- #
 
+# Note: sembra che le funzioni che sono soggette alla JIT non possono stare
+#       all'interno della funzione che effettua la fattorizzazione dato che
+#       ciò fa peggiorare le performance di esecuzione (sul mio pc di 1000 ms).
+#
+# TODO: controllare che effettivamente è vero e il perchè.
+
+## ~~ by COLUMN
 @jit(nopython=True)
 def __column_columns_numba(L: np.array,A: np.array,i: int,j: int) -> bool:
     L[i,j] = np.sqrt(A[i,j]-np.sum(L[i,:j]**2))
@@ -98,6 +105,19 @@ def __row_columns_numba(L: np.array,A: np.array,i: int,j: int) -> bool:
     L[i,j] = (A[i,j]-np.sum(L[i,:j]*L[j,:j])) / L[j,j]
 
 
+## ~~ by ROW
+# Calcola la fattorizzazione degli elementi lungo la diagonale di A
+@jit(nopython=True)
+def __row_diagonal(L:np.ndarray, A:np.ndarray, i:int, j:int) -> bool:
+    L[i,j] = np.sqrt(A[i,j]-np.sum(L[:i,j]**2))
+
+# Calcola la fattorizzazione degli elementi che non sono sulla diagonale di A
+@jit(nopython=True)
+def __row_non_diagonal(L:np.ndarray, A:np.ndarray, i:int, j:int) -> bool:
+    L[i,j] = (A[i,j]-np.sum(L[:i,j]*L[:i,i])) / L[i,i]
+
+
+
 # --- CHOLESKY METHODS --- #
 
 def __compute_by_column(A: np.ndarray, jit=False) -> np.ndarray:
@@ -105,6 +125,9 @@ def __compute_by_column(A: np.ndarray, jit=False) -> np.ndarray:
 
     L = np.zeros(n*n, dtype=float).reshape(n, n)    # inizializzo la matricce risultato
 
+    # questo if è bruttino ma forse è necessario. Potrebbe essere messo all'interno
+    # del for ma così andrei ad effettuare tante volte un controllo che deve 
+    # essere eseguito una volta solo (all'inizio).
     if jit:
         for j in range(n):
             for i in range(j, n):
@@ -125,7 +148,28 @@ def __compute_by_column(A: np.ndarray, jit=False) -> np.ndarray:
 
 
 def __compute_by_row(A: np.ndarray, jit=False) -> np.ndarray:
-    raise NotImplementedError
+    n, _ = A.shape
+
+    L = np.zeros(n*n, dtype=float).reshape(n, n)  # inizializzo la matricce risultato
+
+    if jit:
+        for i in range(n):
+            for j in range(i, n):
+                if (i == j):
+                    __row_diagonal(L,A,i,j)   # calcolo i valori della diagonale
+                else:
+                    __row_non_diagonal(L,A,i,j)  # calcolo i valori delle colonne
+
+    else:
+        for i in range(n):
+            for j in range(i, n):
+                if (i == j):
+                    L[i,j] = np.sqrt(A[i,j]-np.sum(L[:i,j]**2))   # calcolo i valori della diagonale
+                else:
+                    L[i,j] = (A[i,j]-np.sum(L[:i,j]*L[:i,i])) / L[i,i]   # calcolo i valori delle colonne
+
+    # N.B. la matrice va trasposta !!
+    return L.transpose()
 
 
 def __compute_by_diagonal(A: np.ndarray, jit=False) -> np.ndarray:
