@@ -186,6 +186,10 @@ class Cholesky_factorization:
      
     def gauss_elimination(matrix):
         
+        '''
+            Gauss elmination algorithm
+        '''
+        
         #ensure the array
         np.asarray(matrix) 
         #ensure the datatype is float
