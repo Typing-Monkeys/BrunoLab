@@ -1,6 +1,9 @@
 from ctypes.wintypes import FLOAT
 from math import sqrt
+from pickle import TRUE
 import numpy as np
+from scipy.linalg import lu
+
 
 
 class Cholesky_factorization:
@@ -97,32 +100,34 @@ class Cholesky_factorization:
             A), Cholesky_factorization.FLOAT_PRECISION)
 
         return (L == L_correct).all()
+    
 
-    '''
-        Solve linear sistem using cholesky decomposition 
-        with matrix L
-        
-        L -> Decomposition matrix by cholesky ( lower triangular matrix ) 
-        U -> Upper triangular matrix 
-        b -> Know term 
-        x,y -> The solutio of equation
-        x -> The solution using Backword subsostitution
-        y -> The solution using Forword sostitution
-        
-        a_11 a12 ... a_1n  x_1      b1
-        a_12 a22 ... a_2n  x_2      b2
-        ...  ... ... ...         =  ...
-        a_n1 an2 ... a_nn  x_n      bn 
-        
-        linear system --->   [a] {x} = {b}
-        
-        1. Decomposition: [a] = [L][U]
-        2. Substitution: [L][U] = {b}
-            2.1 Backword substitution [U]{x} = {y}
-            2.2 Forward substitution [L]{y} = {b}         
-    '''
 
     def solveLU(L, U, b):
+        
+        '''
+            Solve linear sistem using cholesky decomposition 
+            with matrix L
+            
+            L -> Decomposition matrix by cholesky ( lower triangular matrix ) 
+            U -> Upper triangular matrix 
+            b -> Know term 
+            x,y -> The solutio of equation
+            x -> The solution using Backword subsostitution
+            y -> The solution using Forword sostitution
+            
+            a_11 a12 ... a_1n  x_1      b1
+            a_12 a22 ... a_2n  x_2      b2
+            ...  ... ... ...         =  ...
+            a_n1 an2 ... a_nn  x_n      bn 
+            
+            linear system --->   [a] {x} = {b}
+            
+            1. Decomposition: [a] = [L][U]
+            2. Substitution: [L][U] = {b}
+                2.1 Backword substitution [U]{x} = {y}
+                2.2 Forward substitution [L]{y} = {b}         
+        '''
 
         '''
             THE SYSTEM IS SOLVABLE? 
@@ -165,9 +170,21 @@ class Cholesky_factorization:
 
         return x, y
     
-    #The matrix form must be already in [A|b] form
-    #where A is sistem, and b is the output
-    def gaussElimination(matrix):
+    def is_correct_gauss(A: np.ndarray, G_L: np.ndarray) -> bool:  
+        
+        '''
+            Verify correct reduction of gauss
+        '''
+        
+        # LU decomposition with gauss and pivoting
+        F, L_C = np.round(lu(A, permute_l=True), Cholesky_factorization.FLOAT_PRECISION)
+
+
+        return (G_L == L_C).all()
+    
+        
+     
+    def gauss_elimination(matrix):
         
         #ensure the array
         np.asarray(matrix) 
@@ -193,6 +210,7 @@ class Cholesky_factorization:
         m_final = np.around(m_convert,2)
               
         return m_final
+        
     
 def main():
     A = np.array([
@@ -202,45 +220,50 @@ def main():
         [1, 4, -3.1, 7.6, 2.6],
         [2, 0, 3, 2.6, 15]
     ], dtype=float)
+    
+    # Known term
+    B = np.array([[9.45], 
+                  [-12.20], 
+                  [7.78], 
+                  [-8.1], 
+                  [10.0]], dtype=float)
 
-    print(f"A:\n{A}\n")
-
+    # Calcolate cholesky matrix
     L = Cholesky_factorization.compute(A)
+    
+    # Calcolate gauss matrix
+    G_L = Cholesky_factorization.gauss_elimination(A)
 
+    # Show original matrix 
+    print(f"A:\n{A}\n")
+    # Control matrix is empty 
     if L is None:
         print("Impossibile scomporre la matrice data !!")
         return -1
 
+
+    # Show the result of cholesky factorizaion is correct
     print(f"L:\n{L}")
     print(
         f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution(A, L)) else '❌'}")
     
     print("\n")
     
-    print("\t\tMatrix elimination with Gauss")
+    # Show the result of gauss factorizaion is correct
+    print(f"\t\tMatrix elimination with Gauss:\n{G_L}")
+    print(
+        f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_gauss(A, G_L)) else '❌'}")
     
-    gauss_sol = Cholesky_factorization.gaussElimination(A)
-    
-    print(gauss_sol)
-
-    # Known term
-    B = np.array([[9.45], 
-                  [-12.20], 
-                  [7.78], 
-                  [-8.1], 
-                  [10.0]])
-
     print("\n")
-
-    print("\t\t\tLower matrix")
-
-    # Lower matrix create
+    
+    
+    # Show lower matrix with cholesky 
+    print("\t\t\tLower matrix with cholesky")
     print(L)
-
     print("\n")
 
-    print("\t\t\tTranspose matrix")
-
+    # Show upper matrix with cholesky 
+    print("\t\t\tTranspose matrix with cholesky")
     # Upper matrix
     U = np.transpose(L)
     print(U)
