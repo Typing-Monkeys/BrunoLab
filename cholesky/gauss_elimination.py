@@ -1,8 +1,8 @@
 from ctypes.wintypes import FLOAT
 from math import sqrt
-from pickle import TRUE
+# from pickle import TRUE
 import numpy as np
-from scipy.linalg import lu
+# from scipy.linalg import lu
 
 
 
@@ -170,50 +170,63 @@ class Cholesky_factorization:
 
         return x, y
     
-    def is_correct_gauss(A: np.ndarray, G_L: np.ndarray) -> bool:  
+    def is_correct_gauss(A: np.ndarray, b, x: np.ndarray) -> bool:  
         
         '''
-            Verify correct reduction of gauss
+            Verifica che il Sistema Lineare risolto con Gauss sia corretto.
+            
+               ??
+            Ax == b
         '''
-        
-        # LU decomposition with gauss and pivoting
-        F, L_C = np.round(lu(A, permute_l=True), Cholesky_factorization.FLOAT_PRECISION)
+
+        b_bis = A.dot(x)
+        # true_x = np.array(np.linalg.solve(A, b)).flatten()
+
+        print(f"b:\n{b}")
+        print(b_bis)
 
 
-        return (G_L == L_C).all()
+        return np.allclose(b_bis, b, 0.001)
+
+
     
         
      
-    def gauss_elimination(matrix):
+    def gauss_elimination(A: np.ndarray) -> np.ndarray:
         
         '''
             Gauss elmination algorithm
+
+            Ritorna una Upper Triangular Matrix (è diverso da Cholesky !!)
         '''
-        
-        #ensure the array
-        np.asarray(matrix) 
-        #ensure the datatype is float
-        matrix = matrix.astype(float)
+
+        # effettua una copia (vera) dell'array
+        # e lo casta a float
+        matrix = A.copy()
      
         if matrix[0,0] == 0.0:
             raise Exception("matrix row 1 column 1 cannot be zero!")
+
         n,m = matrix.shape
-        #start the elimination phase
+        
         for i in range(0,n):#row
             for j in range(i+1,n):
                 if matrix[j,i] != 0.0:
-                    multiplier = matrix[j,i]/matrix[i,i]
-                    #print matrix[i,k],matrix[k,k],multiplier 
-                    #just to verbose multiplier process
-                    matrix[j,i:m]=matrix[j,i:m] - multiplier*matrix[i,i:m] 
-        
-        # Convert matrix by float from scientif notation     
-        m_convert = matrix.astype(float)
-        
-        # Rounding 2 decimal place
-        m_final = np.around(m_convert,2)
-              
-        return m_final
+                    matrix[j,i:m]=matrix[j,i:m] - (matrix[j,i]/matrix[i,i])*matrix[i,i:m]
+
+        # questo risolve il sistema dopo aver effettuato l'eliminaizone di GAUSS        
+        x = np.zeros(n)
+        x[n-1] = matrix[n-1][n]/matrix[n-1][n-1]
+
+        for i in range(n-2,-1,-1):
+            x[i] = matrix[i][n]
+            
+            for j in range(i+1,n):
+                x[i] = x[i] - matrix[i][j]*x[j]
+            
+            x[i] = x[i]/matrix[i][i]
+
+        return (matrix, x)
         
     
 def main():
@@ -226,40 +239,38 @@ def main():
     ], dtype=float)
     
     # Known term
-    B = np.array([[9.45], 
-                  [-12.20], 
-                  [7.78], 
-                  [-8.1], 
-                  [10.0]], dtype=float)
+    B = np.array([9.45, -12.20, 7.78, -8.1, 10.0], dtype=float)
 
+    AB = np.c_[A, B]
     # Calcolate cholesky matrix
     L = Cholesky_factorization.compute(A)
     
     # Calcolate gauss matrix
-    G_L = Cholesky_factorization.gauss_elimination(A)
+    G_L, x = Cholesky_factorization.gauss_elimination(AB)
 
     # Show original matrix 
     print(f"A:\n{A}\n")
+    print(AB)
     # Control matrix is empty 
-    if L is None:
+    """ if L is None:
         print("Impossibile scomporre la matrice data !!")
-        return -1
+        return -1 """
 
 
     # Show the result of cholesky factorizaion is correct
-    print(f"L:\n{L}")
+    """ print(f"L:\n{L}")
     print(
         f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_solution(A, L)) else '❌'}")
     
-    print("\n")
+    print("\n") """
     
     # Show the result of gauss factorizaion is correct
-    print(f"\t\tMatrix elimination with Gauss:\n{G_L}")
+    print(f"\t\tMatrix elimination with Gauss:\n{np.round(G_L, 2)}")
     print(
-        f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_gauss(A, G_L)) else '❌'}")
+    #    f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_gauss(A, G_L)) else '❌'}")
+        f"Il risultato è corretto ?: {'✅' if (Cholesky_factorization.is_correct_gauss(A, B, x)) else '❌'}")
     
     print("\n")
-    
     
     # Show lower matrix with cholesky 
     print("\t\t\tLower matrix with cholesky")
