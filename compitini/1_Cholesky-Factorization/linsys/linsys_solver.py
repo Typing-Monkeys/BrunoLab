@@ -1,8 +1,46 @@
 import numpy as np
 
 
-def solve(L: np.ndarray, b: np.array) -> np.array:
+def solve(L: np.ndarray=None, G_U: np.ndarray=None, b: np.array=None) -> np.array:
+    '''
+        Risolve il Sistema Lineare dato.
+    
+        In base ai parametri che ottine:
 
+            - se viene dato solo G_U, risolve il sistema partendo dalla matrice
+                ottenuta con l'eliminazione Gaussiana
+            - se viene dato solo L e b, risolve il sistema partendo dalla matrice
+                L ottenuta con la fattorizzazione di Cholesky
+
+            - se i parametri non rispettano i critri precedenti,
+                lancia un'eccezione
+    '''
+
+    if L is not None and b is not None and G_U is None:
+        return __solve_cholesky(L, b)
+
+    if G_U is not None and L is None and b is None:
+        return __solve_gauss(G_U)
+
+    raise Exception("Wrong Parameters")
+
+
+def is_correct_solution(A: np.ndarray, x: np.array, b: np.array) -> bool:
+    '''
+        Controlla che la soluzione x al sistema dato Ab sia corretta.
+        Questo viene fatto moltiplicando A per x e controllando che il risultato sia
+        uguale a b
+               
+               ??
+            Ax == b
+    '''
+
+    b_bis = A.dot(x)
+
+    return np.allclose(b, b_bis, 0.01)
+
+
+def __solve_cholesky(L: np.ndarray, b: np.array) -> np.array:
     '''
         Solve linear sistem using cholesky decomposition 
         with matrix L
@@ -67,16 +105,19 @@ def solve(L: np.ndarray, b: np.array) -> np.array:
     # return (x, y)
 
 
-def is_correct_solution(A: np.ndarray, x: np.array, b: np.array) -> bool:
-    '''
-        Controlla che la soluzione x al sistema dato Ab sia corretta.
-        Questo viene fatto moltiplicando A per x e controllando che il risultato sia
-        uguale a b
-               
-               ??
-            Ax == b
-    '''
+def __solve_gauss(G_U: np.ndarray) -> np.array:
+    n, _ = G_U.shape
+    x = np.zeros(n)
 
-    b_bis = A.dot(x)
+    # calcola la soluzione del sistema con forward sostitution
+    x[n-1] = G_U[n-1][n]/G_U[n-1][n-1]
 
-    return np.allclose(b, b_bis, 0.01)
+    for i in range(n-2,-1,-1):
+        x[i] = G_U[i][n]
+        
+        for j in range(i+1,n):
+            x[i] = x[i] - G_U[i][j]*x[j]
+        
+        x[i] = x[i]/G_U[i][i]
+
+    return x

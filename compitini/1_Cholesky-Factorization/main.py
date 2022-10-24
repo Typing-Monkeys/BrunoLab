@@ -10,6 +10,8 @@ def main(args):
             Tester.find_limit(seed=args.seed, method=args.method, jit=args.jit)
 
         case "simple":
+            Tester.set_algorithm(args.algorithm)
+
             A, b = Tester.generate_data(size=args.size, seed=args.seed)
 
             _ = Tester.simple_test(A, b, method=args.method, jit=args.jit)
@@ -79,6 +81,15 @@ if __name__ == "__main__":
         type=int,
         default=5,
         help="Specifica la dimensione della matrice (se possibile)."
+    )
+
+    parser.add_argument(
+        "-alg",
+        "--algorithm", 
+        type=str,
+        choices=["cholesky", "gauss"],
+        default="cholesky",
+        help="Indica quale tra i possibili algoritmi utilizzare."
     )
 
     args = parser.parse_args()

@@ -22,7 +22,8 @@ def compute(Ab: np.ndarray) -> np.ndarray:
         matrix = Ab.copy()
      
         if matrix[0,0] == 0.0:
-            raise Exception("matrix row 1 column 1 cannot be zero!")
+            return None
+            # raise Exception("matrix row 1 column 1 cannot be zero!")
 
         n,m = matrix.shape
         
