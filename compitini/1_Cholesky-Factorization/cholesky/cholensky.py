@@ -1,6 +1,7 @@
 from numba import jit
 import numpy as np
 from tqdm import tqdm
+import logging
 
 
 def compute(A: np.ndarray, method="column", jit=False) -> np.ndarray:
@@ -18,6 +19,7 @@ def compute(A: np.ndarray, method="column", jit=False) -> np.ndarray:
     if not is_factorizable:
         return None
 
+    logging.info(f"Computing Cholesky Factorization {method} - jit: {jit}")
     L = methods[method](A, jit) # avvia la relativa implementazione
 
     return L
@@ -44,6 +46,8 @@ def __check_requirements(A: np.ndarray) -> bool:
                 A = nxn
         '''
 
+        logging.info("Checking IS SQUARE")
+
         n, m = matrix.shape
 
         if(m == n):
@@ -64,6 +68,9 @@ def __check_requirements(A: np.ndarray) -> bool:
                 
         '''
 
+        logging.info("Checking IS SYMMETRIC")
+
+
         if(np.allclose(matrix.transpose(), matrix)):
             return True
         
@@ -76,12 +83,18 @@ def __check_requirements(A: np.ndarray) -> bool:
                 eigenvalues > 0     (tutti gli eigenvalue della matrice devono essere positivi)
         '''
 
+        logging.info("Checking IS POSITIVE DEFINITE")
+
+
         eigenvals = np.linalg.eigvals(matrix)
 
         if (np.all(eigenvals > 0)):
             return True
 
         return False
+
+
+    logging.info("Checking Cholesky Requirements")
 
     # controlla se tutti i requisiti sono soddisfatti
     return is_square(A) and is_symmetric(A) and is_positive_definite(A)

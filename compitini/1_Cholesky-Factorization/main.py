@@ -1,8 +1,16 @@
 import tester as Tester
 import argparse
+import logging
 
 
 def main(args):
+    # impostazioni per logging
+    logging.basicConfig(
+        format='%(levelname)s: %(message)s', 
+        level=logging.DEBUG if args.verbose else logging.ERROR
+        )
+
+    # impostazioni per il test
     Tester.set_algorithm(args.algorithm)
 
     # questo funziona solo da python 3.10 in poi
@@ -19,7 +27,6 @@ def main(args):
                     jit=args.jit
                 )
         case "benchmark":
-            # Tester.set_algorithm(args.algorithm)
             _ = Tester.benchmark(
                     size=args.size,
                     seed=args.seed,
@@ -79,6 +86,13 @@ if __name__ == "__main__":
         choices=["cholesky", "gauss"],
         default="cholesky",
         help="Indica quale tra i possibili algoritmi utilizzare."
+    )
+
+    parser.add_argument(
+        "-v",
+        "--verbose", 
+        action="store_true",
+        help="Abilita la modalità verbose mostrano molte più informazioni."
     )
 
     args = parser.parse_args()

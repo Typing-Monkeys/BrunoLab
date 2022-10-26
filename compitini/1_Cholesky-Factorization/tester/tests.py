@@ -123,8 +123,9 @@ def find_limit(starting_size=100, seed=20, method="column", jit=False):
 
 
 def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, Any]:  # TODO: controllare cosa ritornare
-    print("Generating data ...\n")
+    print("Generating data ...")
     A, b = generate_data(size, seed)
+    print()
 
     match ALGORITHM:
         case "cholesky":
