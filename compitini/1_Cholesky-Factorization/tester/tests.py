@@ -53,7 +53,7 @@ def simple_test(A: np.ndarray, b: np.array, method="column", jit=False) -> Tuple
         # --- Risoluzione del Sistema Lineare --- #
         print("SOLVING LINEAR SYSTEM ...")
 
-        linsys_execution_time, x = get_execution_time(Linear_sistem.solve, [L, b])
+        linsys_execution_time, x = get_execution_time(Linear_sistem.solve, [L, None, b])
 
         print(f"x: \n{x}\n")
         print(f"Il risultato è corretto ?: {'✅' if (Linear_sistem.is_correct_solution(A, x, b)) else '❌'}")
