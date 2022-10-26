@@ -122,11 +122,33 @@ def find_limit(starting_size=100, seed=20, method="column", jit=False):
         size *= 2
 
 
-# TODO: implementare !
-#       questa funzione deve prendere in input un algoritmo (Gauss o Cholesky)
-#       e testarlo su una data matrice per vedere quanto è veloce.
-def benchmark(algorithm: Callable) -> Tuple[int, Any]:
-    raise NotImplementedError
+def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, Any]:  # TODO: controllare cosa ritornare
+    print("Generating data ...\n")
+    A, b = generate_data(size, seed)
+
+    match ALGORITHM:
+        case "cholesky":
+            print(f"ALGORITHM:\t Cholesky (by {method})")
+            print(f"MATRIX SIZE:\t {size}x{size}")
+            print(f"SEED:\t\t {seed}")
+            print(f"JIT:\t\t {jit}")
+            print("")
+
+            execution_time, L =  get_execution_time(Cholesky_factorization.compute, [A, method, jit])
+            print(f"Execution Time: {execution_time}")
+
+        case "gauss":
+            print(f"ALGORITHM:\t Gauss")
+            print(f"MATRIX SIZE:\t {size}")
+            print(f"SEED:\t\t {seed}")
+            print("")
+
+            Ab = np.c_[A, b]    # Augmented Matrix
+            execution_time, U = get_execution_time(Gaussian_elimination.compute, [Ab])
+            print(f"Execution Time: {execution_time}")
+
+        case _:
+            raise Exception("Bad Algorithm Name !")
 
 
 def set_algorithm(string: str):

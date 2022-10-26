@@ -3,6 +3,8 @@ import argparse
 
 
 def main(args):
+    Tester.set_algorithm(args.algorithm)
+
     # questo funziona solo da python 3.10 in poi
     # TODO: ci piace ??
     match args.test_mode:
@@ -10,14 +12,21 @@ def main(args):
             Tester.find_limit(seed=args.seed, method=args.method, jit=args.jit)
 
         case "simple":
-            Tester.set_algorithm(args.algorithm)
             _ = Tester.simple_test(
                     size=args.size, 
                     seed=args.seed, 
                     method=args.method, 
                     jit=args.jit
                 )
-        
+        case "benchmark":
+            # Tester.set_algorithm(args.algorithm)
+            _ = Tester.benchmark(
+                    size=args.size,
+                    seed=args.seed,
+                    method=args.method,
+                    jit=args.jit
+                )
+
         case _:
             return -1
 
@@ -29,7 +38,7 @@ if __name__ == "__main__":
         "-tm",
         "--test_mode", 
         type=str,
-        choices=["simple", "find_limit"],
+        choices=["simple", "find_limit", "benchmark"],
         default="simple",
         help="Avvia una tra le varie procedure di testing."
     )
@@ -59,7 +68,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--size", 
         type=int,
-        default=5,
+        default=10_000,
         help="Specifica la dimensione della matrice (se possibile)."
     )
 
