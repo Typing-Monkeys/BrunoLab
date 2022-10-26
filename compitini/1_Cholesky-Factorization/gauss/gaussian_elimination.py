@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 
 def compute(Ab: np.ndarray) -> np.ndarray:
@@ -27,7 +28,7 @@ def compute(Ab: np.ndarray) -> np.ndarray:
 
         n,m = matrix.shape
         
-        for i in range(0,n):#row
+        for i in tqdm(range(0,n), "Gaussian Elimination"):#row
             for j in range(i+1,n):
                 if matrix[j,i] != 0.0:
                     matrix[j,i:m]=matrix[j,i:m] - (matrix[j,i]/matrix[i,i])*matrix[i,i:m]
@@ -60,7 +61,7 @@ def is_correct_solution(A: np.ndarray, G_U: np.ndarray, b: np.array) -> bool:
     # calcola la soluzione del sistema con forward sostitution
     x[n-1] = G_U[n-1][n]/G_U[n-1][n-1]
 
-    for i in range(n-2,-1,-1):
+    for i in tqdm(range(n-2,-1,-1), "Checking Gauss Solution"):
         x[i] = G_U[i][n]
         
         for j in range(i+1,n):
