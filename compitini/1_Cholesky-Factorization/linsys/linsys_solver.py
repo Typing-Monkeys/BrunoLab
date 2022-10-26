@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 
 def solve(L: np.ndarray=None, G_U: np.ndarray=None, b: np.array=None) -> np.array:
@@ -86,7 +87,7 @@ def __solve_cholesky(L: np.ndarray, b: np.array) -> np.array:
     #       metodo utilizzare.
 
     # Forword sostitution
-    for i in range(n):
+    for i in tqdm(range(n), "Solving Cholesky (Forword)"):
         sumj = 0                    # TODO: si portrebbe riscrivere con la 
         for j in range(i):          # sommatoria di numpy
             sumj += L[i, j] * y[j]
@@ -94,7 +95,7 @@ def __solve_cholesky(L: np.ndarray, b: np.array) -> np.array:
         y[i] = (b[i]-sumj)/L[i, i]
 
     # Backword sostitution
-    for i in range(n-1, -1, -1):
+    for i in tqdm(range(n-1, -1, -1), "Solving Cholesky (Backword)"):
         sumj = 0                    # TODO: si portrebbe riscrivere con la 
         for j in range(i+1, n):     # sommatoria di numpy
             sumj += U[i, j] * x[j]
@@ -112,7 +113,7 @@ def __solve_gauss(G_U: np.ndarray) -> np.array:
     # calcola la soluzione del sistema con forward sostitution
     x[n-1] = G_U[n-1][n]/G_U[n-1][n-1]
 
-    for i in range(n-2,-1,-1):
+    for i in tqdm(range(n-2,-1,-1), "Solving Gauss"):
         x[i] = G_U[i][n]
         
         for j in range(i+1,n):
