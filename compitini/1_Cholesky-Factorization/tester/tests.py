@@ -10,7 +10,7 @@ import numpy as np
 ALGORITHM = "cholesky"
 
 
-def simple_test(A: np.ndarray, b: np.array, method="column", jit=False) -> Tuple[np.array, Tuple[int, int]]:
+def simple_test(size=100, seed=20, method="column", jit=False) -> Tuple[np.array, Tuple[int, int]]:
     '''
         Risolve un dato Sistema Lineare con la fattorizzazione di Cholesky.
 
@@ -94,6 +94,8 @@ def simple_test(A: np.ndarray, b: np.array, method="column", jit=False) -> Tuple
 
         return (x, (gauss_execution_time, linsys_execution_time))
 
+
+    A, b = generate_data(size=size, seed=seed)
 
     match ALGORITHM:
         case "cholesky":
