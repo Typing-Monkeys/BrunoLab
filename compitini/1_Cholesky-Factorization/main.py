@@ -7,7 +7,7 @@ def main(args):
     # impostazioni per logging
     logging.basicConfig(
         format='%(levelname)s: %(message)s', 
-        level=logging.DEBUG if args.verbose else logging.ERROR
+        level=logging.INFO if args.verbose else logging.ERROR
         )
 
     # impostazioni per il test
