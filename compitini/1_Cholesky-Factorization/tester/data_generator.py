@@ -1,5 +1,6 @@
 from typing import Tuple
 import numpy as np
+import logging
 
 
 __seed_setted = False
@@ -10,6 +11,7 @@ def __generate_A(size=10, seed=None) -> np.ndarray:
         Genera una matrice Quadrata, Simmetrica e Definita Positiva di dimensione
         size.
     '''
+    logging.info(f"Generating A: {size}x{size}")
 
     # magic ✨
     A = np.random.rand(size, size)
@@ -22,6 +24,8 @@ def __generate_b(size=10, seed=None) -> np.array:
     '''
         Genera il vettore dei termini noti
     '''
+    
+    logging.info(f"Generating b: {size}")
 
     b = np.random.rand(size)
 

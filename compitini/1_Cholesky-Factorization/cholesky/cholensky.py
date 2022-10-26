@@ -1,6 +1,7 @@
-from typing import Literal
 from numba import jit
 import numpy as np
+from tqdm import tqdm
+import logging
 
 
 def compute(A: np.ndarray, method="column", jit=False) -> np.ndarray:
@@ -18,6 +19,7 @@ def compute(A: np.ndarray, method="column", jit=False) -> np.ndarray:
     if not is_factorizable:
         return None
 
+    logging.info(f"Computing Cholesky Factorization {method} - jit: {jit}")
     L = methods[method](A, jit) # avvia la relativa implementazione
 
     return L
@@ -44,6 +46,8 @@ def __check_requirements(A: np.ndarray) -> bool:
                 A = nxn
         '''
 
+        logging.info("Checking IS SQUARE")
+
         n, m = matrix.shape
 
         if(m == n):
@@ -64,6 +68,9 @@ def __check_requirements(A: np.ndarray) -> bool:
                 
         '''
 
+        logging.info("Checking IS SYMMETRIC")
+
+
         if(np.allclose(matrix.transpose(), matrix)):
             return True
         
@@ -76,12 +83,18 @@ def __check_requirements(A: np.ndarray) -> bool:
                 eigenvalues > 0     (tutti gli eigenvalue della matrice devono essere positivi)
         '''
 
+        logging.info("Checking IS POSITIVE DEFINITE")
+
+
         eigenvals = np.linalg.eigvals(matrix)
 
         if (np.all(eigenvals > 0)):
             return True
 
         return False
+
+
+    logging.info("Checking Cholesky Requirements")
 
     # controlla se tutti i requisiti sono soddisfatti
     return is_square(A) and is_symmetric(A) and is_positive_definite(A)
@@ -140,7 +153,7 @@ def __compute_by_column(A: np.ndarray, jit=False) -> np.ndarray:
     # del for ma così andrei ad effettuare tante volte un controllo che deve 
     # essere eseguito una volta solo (all'inizio).
     if jit:
-        for j in range(n):
+        for j in tqdm(range(n), "Cholesky - COLUMN (JIT)"):
             for i in range(j, n):
                 if (i == j):
                     __column_columns_numba(L,A,i,j)   # calcolo i valori della diagonale
@@ -148,7 +161,7 @@ def __compute_by_column(A: np.ndarray, jit=False) -> np.ndarray:
                     __row_columns_numba(L,A,i,j)   # calcolo i valori delle colonne
     
     else:
-        for j in range(n):
+        for j in tqdm(range(n), "Cholesky - COLUMN"):
             for i in range(j, n):
                 if (i == j):
                     L[i,j] = np.sqrt(A[i,j]-np.sum(L[i,:j]**2))   # calcolo i valori della diagonale
@@ -164,7 +177,7 @@ def __compute_by_row(A: np.ndarray, jit=False) -> np.ndarray:
     L = np.zeros(n*n, dtype=float).reshape(n, n)  # inizializzo la matricce risultato
 
     if jit:
-        for i in range(n):
+        for i in tqdm(range(n), "Cholesky - ROW (JIT)"):
             for j in range(i, n):
                 if (i == j):
                     __row_diagonal(L,A,i,j)   # calcolo i valori della diagonale
@@ -172,7 +185,7 @@ def __compute_by_row(A: np.ndarray, jit=False) -> np.ndarray:
                     __row_non_diagonal(L,A,i,j)  # calcolo i valori delle colonne
 
     else:
-        for i in range(n):
+        for i in tqdm(range(n), "Cholesky - ROW"):
             for j in range(i, n):
                 if (i == j):
                     L[i,j] = np.sqrt(A[i,j]-np.sum(L[:i,j]**2))   # calcolo i valori della diagonale
@@ -201,7 +214,7 @@ def __compute_by_diagonal(A: np.ndarray, jit=False) -> np.ndarray:
     internal = 2 * n - 1 - 1
     aux = 0
     if jit:
-        for row in range(2 * n - 1):
+        for row in tqdm(range(2 * n - 1), "Cholesky - DIAGONAL (JIT)"):
             if row < n-1:
                 col = 0
                 L[row, col] = __cholesky_formula_diagonal(row, col, A, L)
@@ -219,7 +232,7 @@ def __compute_by_diagonal(A: np.ndarray, jit=False) -> np.ndarray:
             external += 1
     
     else:
-        for row in range(2 * n - 1):
+        for row in tqdm(range(2 * n - 1), "Cholesky - DIAGONAL"):
             if row < n-1:
                 col = 0
                 L[row, col] = cholesky_formula(row, col, A, L)
