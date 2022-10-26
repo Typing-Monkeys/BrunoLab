@@ -1,4 +1,3 @@
-from typing import Literal
 from numba import jit
 import numpy as np
 from tqdm import tqdm
