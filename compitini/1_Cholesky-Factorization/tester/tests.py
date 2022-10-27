@@ -141,9 +141,9 @@ def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, An
             print(f"Execution Time: {execution_time}")
 
             data = {
-                'A': A.tolist(), 
-                'b': b.tolist(),
-                'res': L.tolist(),
+                #'A': A.tolist(), 
+                #'b': b.tolist(),
+                #'res': L.tolist(),
                 'time': execution_time,
                 'algorithm': ALGORITHM, 
                 'size': size, 'seed': seed, 
@@ -164,9 +164,9 @@ def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, An
             print(f"Execution Time: {execution_time}")
 
             data = {
-                'A': A.tolist(), 
-                'b': b.tolist(),
-                'res': U.tolist(),
+                #'A': A.tolist(), 
+                #'b': b.tolist(),
+                #'res': U.tolist(),
                 'time': execution_time,
                 'algorithm': ALGORITHM, 
                 'size': size, 'seed': seed, 
@@ -193,6 +193,6 @@ def set_algorithm(string: str):
 
 def __save(data: Dict):
     logger.info("Saving Data")
-    with open(f"{data['algorithm']}_{data['size']}_{data['seed']}.json", "w") as f:
+    with open(f"{data['algorithm']}_{data['method']}_{data['size']}_{data['seed']}.json", "w") as f:
         jsonobj = json.dumps(data)
         f.write(jsonobj)
