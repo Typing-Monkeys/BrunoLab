@@ -1,4 +1,6 @@
-from typing import Any, Callable, Tuple
+from asyncio.log import logger
+import json
+from typing import Any, Callable, Dict, Tuple
 from .execution_time import get_execution_time
 from .data_generator import generate_data
 import cholesky as Cholesky_factorization
@@ -135,8 +137,21 @@ def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, An
             print(f"JIT:\t\t {jit}")
             print("")
 
-            execution_time, L =  get_execution_time(Cholesky_factorization.compute, [A, method, jit])
+            execution_time, L =  get_execution_time(Cholesky_factorization.compute, [A, method, jit, True])
             print(f"Execution Time: {execution_time}")
+
+            data = {
+                #'A': A.tolist(), 
+                #'b': b.tolist(),
+                #'res': L.tolist(),
+                'time': execution_time,
+                'algorithm': ALGORITHM, 
+                'size': size, 'seed': seed, 
+                'method': method,
+                'jit': jit
+                }
+
+            __save(data)
 
         case "gauss":
             print(f"ALGORITHM:\t Gauss")
@@ -147,6 +162,19 @@ def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, An
             Ab = np.c_[A, b]    # Augmented Matrix
             execution_time, U = get_execution_time(Gaussian_elimination.compute, [Ab])
             print(f"Execution Time: {execution_time}")
+
+            data = {
+                #'A': A.tolist(), 
+                #'b': b.tolist(),
+                #'res': U.tolist(),
+                'time': execution_time,
+                'algorithm': ALGORITHM, 
+                'size': size, 'seed': seed, 
+                'method': None,
+                'jit': None,
+                }
+
+            __save(data)
 
         case _:
             raise Exception("Bad Algorithm Name !")
@@ -161,3 +189,10 @@ def set_algorithm(string: str):
     global ALGORITHM
 
     ALGORITHM = string
+
+
+def __save(data: Dict):
+    logger.info("Saving Data")
+    with open(f"{data['algorithm']}_{data['method']}_{data['size']}_{data['seed']}.json", "w") as f:
+        jsonobj = json.dumps(data)
+        f.write(jsonobj)
