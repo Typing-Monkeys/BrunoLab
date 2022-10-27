@@ -135,7 +135,7 @@ def benchmark(size=10_000, seed=20, method="column", jit=False) -> Tuple[int, An
             print(f"JIT:\t\t {jit}")
             print("")
 
-            execution_time, L =  get_execution_time(Cholesky_factorization.compute, [A, method, jit])
+            execution_time, L =  get_execution_time(Cholesky_factorization.compute, [A, method, jit, True])
             print(f"Execution Time: {execution_time}")
 
         case "gauss":

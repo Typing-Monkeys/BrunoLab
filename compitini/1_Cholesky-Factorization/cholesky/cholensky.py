@@ -4,7 +4,7 @@ from tqdm import tqdm
 import logging
 
 
-def compute(A: np.ndarray, method="column", jit=False) -> np.ndarray:
+def compute(A: np.ndarray, method="column", jit=False, nocontrols=False) -> np.ndarray:
     '''
         Applica la fattorizzazinoe di Cholesky per ottenere la matrice L
         Per poter funzionare devono essere rispettate le condizioni imposte dalle
@@ -13,7 +13,14 @@ def compute(A: np.ndarray, method="column", jit=False) -> np.ndarray:
         jit:   se True, ottimizza l'esecuzione di questa funzione con numba.
     '''
 
-    is_factorizable = __check_requirements(A)
+    # se specificato i controlli iniziali vengono saltati
+    # per risparmiare tempo
+    if nocontrols: 
+        logging.info("Skipping Requirements")
+        is_factorizable = True
+    
+    else:
+        is_factorizable = __check_requirements(A)
 
     # i vincoli non sono soddisfatti, la matrice data non si può fattorizzare
     if not is_factorizable:
@@ -95,7 +102,7 @@ def __check_requirements(A: np.ndarray) -> bool:
 
 
     logging.info("Checking Cholesky Requirements")
-
+    
     # controlla se tutti i requisiti sono soddisfatti
     return is_square(A) and is_symmetric(A) and is_positive_definite(A)
 
