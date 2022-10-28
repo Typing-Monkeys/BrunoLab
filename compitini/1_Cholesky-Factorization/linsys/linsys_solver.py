@@ -75,13 +75,12 @@ def __solve_cholesky(L: np.ndarray, b: np.array) -> np.array:
                
     '''
 
-    # Transformation the matrix by 0 and shape
-    L = np.array(L, float)
     U = np.transpose(L)
-    b = np.array(b, float)
     n, _ = np.shape(L)
-    y = np.zeros(n)
-    x = np.zeros(n)
+
+    # soluzioni (forword/backword)
+    y = np.zeros(n, dtype=np.float64)   # forzo tipo float64
+    x = np.zeros(n, dtype=np.float64)
 
     # TODO: si potrebbe aggiungere un argomento per scegliere quale 
     #       metodo utilizzare.
