@@ -71,7 +71,7 @@ def is_correct_solution(A: np.ndarray, G_U: np.ndarray, b: np.array) -> bool:
 
     b_bis = A.dot(x)
 
-    return np.allclose(b_bis, b, 0.001)
+    return np.allclose(b_bis, b, 0.001, 0.001)
 
 
 if __name__ == "__main__":

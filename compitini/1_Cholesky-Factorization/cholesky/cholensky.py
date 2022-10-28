@@ -41,7 +41,7 @@ def is_correct_solution(A: np.ndarray, L: np.ndarray) -> bool:
 		
         # print(A_bis)
 
-		return np.allclose(A, A_bis, 0.001)
+		return np.allclose(A, A_bis, 0.001, 0.001)
 
 
 def __check_requirements(A: np.ndarray) -> bool:
