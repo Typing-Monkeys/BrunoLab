@@ -38,7 +38,7 @@ def is_correct_solution(A: np.ndarray, x: np.array, b: np.array) -> bool:
 
     b_bis = A.dot(x)
 
-    return np.allclose(b, b_bis, 0.01)
+    return np.allclose(b, b_bis, 0.001, 0.001)    # TODO: testare
 
 
 def __solve_cholesky(L: np.ndarray, b: np.array) -> np.array:
